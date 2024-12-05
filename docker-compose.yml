@@ -32,4 +32,4 @@ services:
       - "./.crawlab/master:/root/.crawlab"  # persistent crawlab metadata
       - "./crawlab/mongo/data/db:/data/db"  # persistent mongo data
     ports:
-      - "27017:27017"  # expose mongo port to host machine
+      - "17017:27017"  # expose mongo port to host machine
