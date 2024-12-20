@@ -17,11 +17,13 @@ services:
       - "./.crawlab/master:/root/.crawlab"  # persistent crawlab metadata
       - "./crawlab/master:/data"  # persistent crawlab data
       - "./crawlab/log:/var/log/crawlab" # log persistent
+      - "./data/images:/root/images"
     ports:
       - "8080:8080"  # exposed api port
       - "9333:9333"
     depends_on:
       - mongo
+      - ftpd_server
 
   mongo:
     image: mongo:4.2
@@ -34,3 +36,28 @@ services:
       - "./crawlab/mongo/data/db:/data/db"  # persistent mongo data
     ports:
       - "17017:27017"  # expose mongo port to host machine
+
+  ftpd_server:
+    image: stilliard/pure-ftpd
+    container_name: pure-ftpd
+    ports:
+      - "21:21"
+      # - "30000-30009:30000-30009"
+    volumes:
+      - "./data:/home/gx/"
+      - "./passwd:/etc/pure-ftpd/passwd"
+    environment:
+      FTP_USER_NAME: gx
+      FTP_USER_PASS: gx301213
+      FTP_USER_HOME: /home/gx
+    restart: always
+
+  nginx_image_server:
+    image: nginx:latest
+    container_name: nginx_image_server_container
+    ports:
+      - "8010:80"
+    volumes:
+      - "./data/images:/usr/share/nginx/images"
+      - "./nginx/nginx_image_server/www:/usr/share/nginx/html"
+      - "./nginx/nginx_image_server:/etc/nginx"
