@@ -40,6 +40,7 @@ services:
   ftpd_server:
     image: stilliard/pure-ftpd
     container_name: pure-ftpd
+    restart: always
     ports:
       - "21:21"
       # - "30000-30009:30000-30009"
@@ -50,11 +51,11 @@ services:
       FTP_USER_NAME: gx
       FTP_USER_PASS: gx301213
       FTP_USER_HOME: /home/gx
-    restart: always
 
   nginx_image_server:
     image: nginx:latest
     container_name: nginx_image_server_container
+    restart: always
     ports:
       - "8010:80"
     volumes:
