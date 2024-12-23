@@ -1,0 +1,3 @@
+FROM crawlabteam/crawlab:latest
+
+RUN pip install pillow -i https://mirrors.tuna.tsinghua.edu.cn/pypi/web/simple

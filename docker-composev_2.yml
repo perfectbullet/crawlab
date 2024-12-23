@@ -1,0 +1,67 @@
+version: '3.3'
+
+services:
+  master:
+    image: crawlabteam/crawlabv2
+    build:
+      context: .
+      dockerfile: ./Dockerfile_v2
+    container_name: crawlab_master
+    restart: always
+    environment:
+      CRAWLAB_NODE_MASTER: "Y"  # Y: master node
+      CRAWLAB_MONGO_HOST: "mongo"  # mongo host address. In the docker compose network, directly refer to the service name
+      CRAWLAB_MONGO_PORT: "27017"  # mongo port
+      CRAWLAB_MONGO_DB: "crawlab"  # mongo database
+      CRAWLAB_MONGO_USERNAME: "gx"  # mongo username
+      CRAWLAB_MONGO_PASSWORD: "gx301213"  # mongo password
+      CRAWLAB_MONGO_AUTHSOURCE: "admin"  # mongo auth source
+    volumes:
+      - "./.crawlab/master:/root/.crawlab"  # persistent crawlab metadata
+      - "./crawlab/master:/data"  # persistent crawlab data
+      - "./crawlab/log:/var/log/crawlab" # log persistent
+      - "./data/images:/root/images"
+    ports:
+      - "8080:8080"  # exposed api port
+      - "9333:9333"
+    depends_on:
+      - mongo
+      - ftpd_server
+
+  mongo:
+    image: mongo:4.2
+    restart: always
+    environment:
+      MONGO_INITDB_ROOT_USERNAME: "gx"  # mongo username
+      MONGO_INITDB_ROOT_PASSWORD: "gx301213"  # mongo password
+    volumes:
+      - "./.crawlab/master:/root/.crawlab"  # persistent crawlab metadata
+      - "./crawlab/mongo/data/db:/data/db"  # persistent mongo data
+    ports:
+      - "17017:27017"  # expose mongo port to host machine
+
+  ftpd_server:
+    image: stilliard/pure-ftpd
+    container_name: pure-ftpd
+    restart: always
+    ports:
+      - "21:21"
+      # - "30000-30009:30000-30009"
+    volumes:
+      - "./data:/home/gx/"
+      - "./passwd:/etc/pure-ftpd/passwd"
+    environment:
+      FTP_USER_NAME: gx
+      FTP_USER_PASS: gx301213
+      FTP_USER_HOME: /home/gx
+
+  nginx_image_server:
+    image: nginx:latest
+    container_name: nginx_image_server_container
+    restart: always
+    ports:
+      - "8010:80"
+    volumes:
+      - "./data/images:/usr/share/nginx/images"
+      - "./nginx/nginx_image_server/www:/usr/share/nginx/html"
+      - "./nginx/nginx_image_server:/etc/nginx"
