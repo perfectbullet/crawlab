@@ -7,7 +7,7 @@ services:
       context: .
       dockerfile: ./Dockerfile_v2
     container_name: crawlab_master
-    restart: always
+#    restart: always
     environment:
       CRAWLAB_NODE_MASTER: "Y"  # Y: master node
       CRAWLAB_MONGO_HOST: "mongo"  # mongo host address. In the docker compose network, directly refer to the service name
@@ -18,7 +18,7 @@ services:
       CRAWLAB_MONGO_AUTHSOURCE: "admin"  # mongo auth source
     volumes:
       - "./.crawlab/master:/root/.crawlab"  # persistent crawlab metadata
-      - "./crawlab/master:/data"  # persistent crawlab data
+      - crawlab_master_data:/data  # persistent crawlab data， seaweedfs 文件系统数据, 保存爬虫脚本，等
       - "./crawlab/log:/var/log/crawlab" # log persistent
       - "./data/images:/root/images"
     ports:
@@ -30,20 +30,20 @@ services:
 
   mongo:
     image: mongo:4.2
-    restart: always
+#    restart: always
     environment:
       MONGO_INITDB_ROOT_USERNAME: "gx"  # mongo username
       MONGO_INITDB_ROOT_PASSWORD: "gx301213"  # mongo password
     volumes:
       - "./.crawlab/master:/root/.crawlab"  # persistent crawlab metadata
-      - "./crawlab/mongo/data/db:/data/db"  # persistent mongo data
+      - crawlab_mongo_data_db:/data/db  # 命名卷持久化数据
     ports:
-      - "17017:27017"  # expose mongo port to host machine
+      - "27017:27017"  # expose mongo port to host machine
 
   ftpd_server:
     image: stilliard/pure-ftpd
     container_name: pure-ftpd
-    restart: always
+#    restart: always
     ports:
       - "21:21"
       # - "30000-30009:30000-30009"
@@ -58,10 +58,14 @@ services:
   nginx_image_server:
     image: nginx:latest
     container_name: nginx_image_server_container
-    restart: always
+#    restart: always
     ports:
       - "8010:80"
     volumes:
       - "./data/images:/usr/share/nginx/images"
       - "./nginx/nginx_image_server/www:/usr/share/nginx/html"
       - "./nginx/nginx_image_server:/etc/nginx"
+
+volumes:
+  crawlab_mongo_data_db:  # Named volume for MongoDB data persistence
+  crawlab_master_data:    # persistent crawlab data， seaweedfs 文件系统数据, 保存爬虫脚本，等
