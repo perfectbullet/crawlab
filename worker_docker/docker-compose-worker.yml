@@ -1,0 +1,18 @@
+# 工作节点
+version: '3.3'
+services:
+  worker:
+    image: crawlabteam/crawlab
+    container_name: crawlab_worker
+    restart: always
+    environment:
+      CRAWLAB_NODE_MASTER: "N"  # N: 工作节点
+      CRAWLAB_GRPC_ADDRESS: "8.137.52.106:9333"  # grpc address
+      CRAWLAB_FS_FILER_URL: "http://8.137.52.106:8080/api/filer"  # seaweedfs api
+    volumes:
+      - dot_crawlab_worker:/root/.crawlab"  # 持久化 crawlab 元数据
+      - crawlab_worker:/data  # 持久化 crawlab 数据
+
+volumes:
+  crawlab_worker:
+  dot_crawlab_worker:

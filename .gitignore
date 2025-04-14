@@ -9,3 +9,5 @@ _book/
 vendor/
 .crawlab
 dist/
+data
+passwd
